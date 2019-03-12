@@ -11,7 +11,8 @@ import scala.io.Source
 
 case class Event(eventData: String)
 
-class ReadEventsStage extends InputStage[Event] {
+class ReadEventsStage(stageName: Option[String] = None)
+    extends InputStage[Event](stageName) {
 
   implicit val formats = DefaultFormats
   val fileName = "events.json"
@@ -19,10 +20,9 @@ class ReadEventsStage extends InputStage[Event] {
   override def main(context: Context): DataStream[Event] = {
     val fileContents = Source.fromResource(fileName).getLines.mkString
     val parsedContents = parse(fileContents)
-    val events = parsedContents.children.map(x => Event(new String(write(x)))).toSeq
+    val events = parsedContents.children.map(x => Event(compact(render(x))))
 
-    context
-      .env
+    context.env
       .fromCollection(events)
   }
 }
