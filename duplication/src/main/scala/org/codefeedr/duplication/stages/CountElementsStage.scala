@@ -13,7 +13,6 @@ class CountElementsStage(stageId: Option[String] = None, seconds: Int = 10)
     getContext.env.setStreamTimeCharacteristic(TimeCharacteristic.IngestionTime)
 
     source
-    //.assignAscendingTimestamps(_.created_at.getTime)
       .map(x => ("sum", 1))
       .keyBy(_._1)
       .timeWindowAll(Time.seconds(seconds))

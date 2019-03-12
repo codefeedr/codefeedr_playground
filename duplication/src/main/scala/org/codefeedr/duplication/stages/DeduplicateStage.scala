@@ -22,11 +22,11 @@ class DeduplicateStage(stageName: Option[String] = None)
 
         parse(x).extract[PushEvent]
       }
-      .assignTimestampsAndWatermarks(
-        new PushOutOfOrdernessTimestampExtractor(Time.seconds(5)))
-      .keyBy(_.id)
-      .timeWindow(Time.seconds(5))
-      .apply(new DuplicateWindow[PushEvent, String, TimeWindow]())
+    //.assignTimestampsAndWatermarks(
+    //  new PushOutOfOrdernessTimestampExtractor(Time.seconds(5)))
+    //.keyBy(_.id)
+    //.timeWindow(Time.seconds(5))
+    //.apply(new DuplicateWindow[PushEvent, String, TimeWindow]())
   }
 }
 
