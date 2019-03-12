@@ -22,11 +22,12 @@ class DeduplicateStage(stageName: Option[String] = None)
 
         parse(x).extract[PushEvent]
       }
-    //.assignTimestampsAndWatermarks(
-    //  new PushOutOfOrdernessTimestampExtractor(Time.seconds(5)))
-    //.keyBy(_.id)
-    //.timeWindow(Time.seconds(5))
-    //.apply(new DuplicateWindow[PushEvent, String, TimeWindow]())
+      .assignTimestampsAndWatermarks(
+        new PushOutOfOrdernessTimestampExtractor(Time.seconds(5)))
+      .keyBy(x => x.id)
+      .timeWindow(Time.seconds(10))
+      .allowedLateness(Time.seconds(Long.MaxValue))
+      .apply(new DuplicateWindow[PushEvent, String]())
   }
 }
 
@@ -37,18 +38,16 @@ class PushOutOfOrdernessTimestampExtractor(t: Time)
     element.created_at.getTime
 }
 
-class DuplicateWindow[IN, KEY, W <: Window]
-    extends WindowFunction[IN, IN, KEY, W] {
+class DuplicateWindow[IN, KEY] extends WindowFunction[IN, IN, KEY, TimeWindow] {
 
   override def apply(key: KEY,
-                     window: W,
+                     window: TimeWindow,
                      input: Iterable[IN],
                      out: Collector[IN]): Unit = {
     if (input.size > 1) {
       println("Found a duplicate, just emitting only one.")
     }
 
-    println("Here")
     out.collect(input.head)
   }
 }

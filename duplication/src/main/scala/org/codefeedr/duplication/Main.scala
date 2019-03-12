@@ -19,11 +19,10 @@ object Main {
   def main(args: Array[String]): Unit = {
     new PipelineBuilder()
       .append(new ReadEventsStage(Some(UUID.randomUUID().toString)))
-      .append(
-        new DeduplicateStage(stageName = Some(UUID.randomUUID().toString)))
+      .append(new DeduplicateStage(Some(UUID.randomUUID().toString)))
       /**.append { trans: DataStream[PushEvent] =>
         trans
-          .map(_.created_at)
+          .map(_.id)
           .print()
       }**/
       .append(new CountElementsStage())
